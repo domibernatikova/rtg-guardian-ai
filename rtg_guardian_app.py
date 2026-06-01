@@ -9,7 +9,53 @@ st.set_page_config(
     page_icon="🏥",
     layout="wide"
 )
+st.markdown("""
+<style>
 
+.main {
+    background-color: #07111f;
+}
+
+.big-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    color: #9aa6b2;
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: linear-gradient(135deg,#0f172a,#1e293b);
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid #334155;
+    box-shadow: 0 0 15px rgba(0,255,255,0.08);
+}
+
+.alert-card {
+    background: linear-gradient(135deg,#7f1d1d,#450a0a);
+    padding: 18px;
+    border-radius: 16px;
+    color:white;
+    border-left: 6px solid #ef4444;
+}
+
+.success-card {
+    background: linear-gradient(135deg,#052e16,#14532d);
+    padding: 18px;
+    border-radius: 16px;
+    color:white;
+    border-left: 6px solid #22c55e;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # HLAVIČKA
 
 st.title("🏥 GUARDIANRX COMMAND CENTER")
