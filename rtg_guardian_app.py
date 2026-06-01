@@ -1,38 +1,51 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="GuardianRX AI", layout="wide")
+st.set_page_config(
+    page_title="GuardianRX AI",
+    layout="wide"
+)
 
 st.title("🏥 GuardianRX AI")
-st.subheader("AI analýza RTG hrudníku")
+st.subheader("Test propojení s Hugging Face")
 
 uploaded = st.file_uploader(
-    "Nahraj RTG snímek",
+    "Nahraj obrázek",
     type=["jpg", "jpeg", "png"]
 )
 
 if uploaded:
 
-    st.image(uploaded, caption="Nahraný RTG snímek")
+    st.image(uploaded)
 
-    API_URL = "https://api-inference.huggingface.co/models/lxyuan/vit-xray-pneumonia-classification"
+    API_URL = "https://api-inference.huggingface.co/models/microsoft/resnet-50"
 
     headers = {
         "Authorization": f"Bearer {st.secrets['HF_TOKEN']}"
     }
 
-    with st.spinner("AI analyzuje RTG..."):
+    with st.spinner("Analyzuji obrázek..."):
 
-        response = requests.post(
-            API_URL,
-            headers=headers,
-            data=uploaded.getvalue(),
-            timeout=60
-        )
+        try:
 
-    st.write("Status:", response.status_code)
+            response = requests.post(
+                API_URL,
+                headers=headers,
+                data=uploaded.getvalue(),
+                timeout=60
+            )
 
-    try:
-        st.json(response.json())
-    except Exception:
-        st.write(response.text)
+            st.success("Požadavek odeslán")
+
+            st.write("Status code:")
+            st.write(response.status_code)
+
+            st.write("Odpověď:")
+
+            try:
+                st.json(response.json())
+            except:
+                st.write(response.text)
+
+        except Exception as e:
+            st.error(str(e))
