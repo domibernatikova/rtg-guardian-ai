@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -9,78 +8,89 @@ st.set_page_config(
     page_icon="🏥",
     layout="wide"
 )
+
+# ===== DESIGN =====
+
 st.markdown("""
 <style>
 
-.main {
-    background-color: #07111f;
+.stApp {
+    background: #07111f;
 }
 
-.big-title {
-    font-size: 42px;
+.main-title {
+    font-size: 48px;
     font-weight: 800;
     color: white;
     text-align: center;
 }
 
-.subtitle {
+.sub-title {
     text-align: center;
-    color: #9aa6b2;
+    color: #94a3b8;
     font-size: 18px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
-.metric-card {
-    background: linear-gradient(135deg,#0f172a,#1e293b);
+.live-box {
+    background: linear-gradient(135deg,#991b1b,#450a0a);
     padding: 20px;
     border-radius: 18px;
-    border: 1px solid #334155;
-    box-shadow: 0 0 15px rgba(0,255,255,0.08);
+    color: white;
+    margin-bottom: 20px;
 }
 
-.alert-card {
-    background: linear-gradient(135deg,#7f1d1d,#450a0a);
-    padding: 18px;
-    border-radius: 16px;
-    color:white;
-    border-left: 6px solid #ef4444;
-}
-
-.success-card {
-    background: linear-gradient(135deg,#052e16,#14532d);
-    padding: 18px;
-    border-radius: 16px;
-    color:white;
-    border-left: 6px solid #22c55e;
+.section-box {
+    background: #0f172a;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1px solid #1e293b;
 }
 
 </style>
 """, unsafe_allow_html=True)
-# HLAVIČKA
 
-st.title("🏥 GUARDIANRX COMMAND CENTER")
-st.caption("AI operační centrum radiologie Moravskoslezského kraje")
+# ===== HLAVIČKA =====
 
-# KPI
+st.markdown("""
+<div class="main-title">
+🏥 GUARDIANRX COMMAND CENTER
+</div>
 
-c1, c2, c3, c4 = st.columns(4)
+<div class="sub-title">
+AI operační centrum radiologie Moravskoslezského kraje
+</div>
+""", unsafe_allow_html=True)
 
-c1.metric("🔴 Kritické případy", "8")
-c2.metric("⏱ Průměrná čekací doba", "14 min")
-c3.metric("📉 Zkrácení čekání", "43 %")
-c4.metric("🛡 Patient Shield", "17")
+# ===== KPI =====
 
-st.info("""
-23 radiologických pracovišť online.
+k1, k2, k3, k4 = st.columns(4)
 
-AI právě monitoruje 159 snímků.
+with k1:
+    st.metric("🔴 Kritické případy", "8")
 
-8 případů vyžaduje okamžitou kontrolu.
-""")
+with k2:
+    st.metric("⏱ Čekací doba", "14 min")
 
-st.divider()
+with k3:
+    st.metric("📉 Zrychlení", "43 %")
 
-# ANALÝZA RTG
+with k4:
+    st.metric("🛡 Shield zásahy", "17")
+
+# ===== LIVE STATUS =====
+
+st.markdown("""
+<div class="live-box">
+<h3>🔴 LIVE STATUS</h3>
+
+23 radiologických pracovišť online<br>
+159 aktivních snímků ve frontách<br>
+8 případů vyžaduje okamžitou kontrolu
+</div>
+""", unsafe_allow_html=True)
+
+# ===== ANALÝZA RTG =====
 
 st.header("🩻 Analýza RTG snímku")
 
@@ -91,75 +101,67 @@ uploaded = st.file_uploader(
 
 if uploaded:
 
-    st.image(uploaded, caption="Nahraný RTG snímek", width=350)
-
-    ai_prob = st.slider(
-        "Pravděpodobnost nálezu (%)",
-        0,
-        100,
-        85
-    )
-
-    waiting = st.slider(
-        "Čekací doba (min)",
-        0,
-        120,
-        10
-    )
-
-    workload = st.slider(
-        "Vytížení pracoviště (%)",
-        0,
-        100,
-        75
-    )
-
-    ai_score = ai_prob / 100
-    waiting_score = min(waiting / 60, 1)
-    workload_score = workload / 100
-
-    priority = (
-        0.7 * ai_score +
-        0.2 * waiting_score +
-        0.1 * workload_score
-    )
-
-    if waiting > 60:
-        st.error(
-            "🛡 PATIENT SHIELD AKTIVOVÁN — pacient automaticky povýšen."
-        )
-        level = "🔴 KRITICKÁ"
-
-    elif priority > 0.8:
-        level = "🔴 KRITICKÁ"
-
-    elif priority > 0.6:
-        level = "🟠 VYSOKÁ"
-
-    elif priority > 0.4:
-        level = "🟡 STŘEDNÍ"
-
-    else:
-        level = "🟢 NÍZKÁ"
-
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1,1])
 
     with col1:
-        st.metric(
-            "Prioritní skóre",
-            f"{priority:.2f}"
-        )
+        st.image(uploaded, caption="Nahraný RTG snímek")
 
     with col2:
-        st.metric(
-            "Zařazení",
-            level
+
+        ai_prob = st.slider(
+            "Pravděpodobnost nálezu (%)",
+            0,
+            100,
+            85
         )
 
-    st.success(f"""
+        waiting = st.slider(
+            "Čekací doba (min)",
+            0,
+            120,
+            15
+        )
+
+        workload = st.slider(
+            "Vytížení pracoviště (%)",
+            0,
+            100,
+            75
+        )
+
+        ai_score = ai_prob / 100
+        waiting_score = min(waiting / 60, 1)
+        workload_score = workload / 100
+
+        priority = (
+            0.7 * ai_score +
+            0.2 * waiting_score +
+            0.1 * workload_score
+        )
+
+        if waiting > 60:
+            st.error("🛡 PATIENT SHIELD AKTIVOVÁN")
+            level = "🔴 KRITICKÁ"
+
+        elif priority > 0.8:
+            level = "🔴 KRITICKÁ"
+
+        elif priority > 0.6:
+            level = "🟠 VYSOKÁ"
+
+        elif priority > 0.4:
+            level = "🟡 STŘEDNÍ"
+
+        else:
+            level = "🟢 NÍZKÁ"
+
+        st.metric("Prioritní skóre", f"{priority:.2f}")
+        st.metric("Zařazení", level)
+
+        st.success(f"""
 Pravděpodobnost nálezu: {ai_prob} %
 
-Doporučení AI:
+Doporučení:
 Prioritní kontrola radiologem.
 
 Toto není diagnóza.
@@ -168,7 +170,7 @@ Finální rozhodnutí provádí radiolog.
 
 st.divider()
 
-# FRONTA
+# ===== FRONTA =====
 
 st.header("📋 Inteligentní fronta radiologa")
 
@@ -178,7 +180,7 @@ sample = pd.DataFrame([
     ["P003", 81, 12],
     ["P004", 54, 22],
     ["P005", 92, 3],
-    ["P006", 30, 65]
+    ["P006", 30, 65],
 ], columns=["Pacient", "AI %", "Čeká min"])
 
 def status(ai, wait):
@@ -203,9 +205,9 @@ sample["Status"] = sample.apply(
 )
 
 sample["Priorita"] = (
-    0.7 * (sample["AI %"] / 100)
-    + 0.2 * (sample["Čeká min"].clip(upper=60) / 60)
-    + 0.1 * 0.75
+    0.7*(sample["AI %"]/100)
+    + 0.2*(sample["Čeká min"].clip(upper=60)/60)
+    + 0.1*0.75
 )
 
 sample = sample.sort_values(
@@ -215,37 +217,45 @@ sample = sample.sort_values(
 
 st.dataframe(
     sample[
-        ["Pacient", "AI %", "Čeká min", "Status"]
+        ["Pacient","AI %","Čeká min","Status"]
     ],
     use_container_width=True
 )
 
-st.divider()
-
-# KRAJ
-
-st.header("🗺 Stav pracovišť v kraji")
-
-st.markdown("""
-### FN Ostrava
-🔴 Vytížení 95 %
-
-### Karviná
-🟢 Vytížení 62 %
-
-### Opava
-🟡 Vytížení 81 %
-
-### Frýdek-Místek
-🟢 Vytížení 58 %
-
-### Doporučení AI
-Přesměrovat nové popisy do Karviné.
+st.info("""
+🛡 Patient Shield:
+Pacienti čekající déle než 60 minut jsou automaticky
+eskalováni bez ohledu na predikci AI.
 """)
 
 st.divider()
 
-# PREDIKCE
+# ===== KRAJ =====
+
+st.header("🗺 Krajské operační centrum")
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    st.error("FN Ostrava\n\n95 % kapacity")
+
+with c2:
+    st.success("Karviná\n\n62 % kapacity")
+
+with c3:
+    st.warning("Opava\n\n81 % kapacity")
+
+st.markdown("""
+### Doporučení AI
+
+Přesměrovat nové popisy RTG z FN Ostrava do Karviné.
+
+Odhadované zkrácení čekací doby: **22 %**
+""")
+
+st.divider()
+
+# ===== PREDIKCE =====
 
 st.header("📈 Predikce respirační zátěže")
 
@@ -256,7 +266,7 @@ pred = pd.DataFrame({
         "Opava",
         "Bruntál"
     ],
-    "Růst případů (%)": [
+    "Nárůst případů (%)": [
         18,
         12,
         5,
@@ -270,7 +280,7 @@ st.bar_chart(
 
 st.divider()
 
-# FEEDBACK
+# ===== FEEDBACK =====
 
 st.header("✅ Zpětná vazba radiologa")
 
@@ -300,19 +310,18 @@ if st.button("Uložit feedback"):
         )
 
     else:
+
         row.to_csv(
             file,
             index=False
         )
 
-    st.success(
-        "Feedback uložen."
-    )
+    st.success("Feedback uložen.")
 
 st.divider()
 
 st.warning("""
-AI není diagnostický nástroj.
+⚠️ AI není diagnostický nástroj.
 
 Slouží pouze k prioritizaci fronty.
 
